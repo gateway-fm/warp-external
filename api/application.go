@@ -14,6 +14,7 @@ type ITemplateFunc interface {
 		ifaces []interface{},
 		cfgPath, configTemplatePath, outPutFilePath string,
 		funcMap template.FuncMap) (*templater.Template, error)
+	CreateWarpCfg(cfg any) *any
 }
 type TemplateFuncs struct {
 	tps  []templater.ITemplate
@@ -26,7 +27,10 @@ func (t *TemplateFuncs) GetExternals() ([]templater.ITemplate, error) {
 func (t *TemplateFuncs) AddNewTemplate(temp *templater.Template) {
 	t.tps = append(t.tps, temp)
 }
-
+func (t *TemplateFuncs) CreateWarpCfg(cfg any) *any {
+	t.temp.CfgSummon = &cfg
+	return t.temp.CfgSummon
+}
 func (t *TemplateFuncs) NewTemplate(elems []string, ifaces []interface{}, cfgPath, configTemplatePath, outPutFilePath string, funcMap template.FuncMap) (*templater.Template, error) {
 	t.temp = templater.Template{
 		Elems:              elems,

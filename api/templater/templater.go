@@ -17,12 +17,8 @@ type ITemplate interface {
 	GenerateNonGo() error
 }
 
-type WarpConfig struct {
-	CfgSumm *any
-}
-
 type Template struct {
-	CfgSummon                                   *WarpConfig
+	CfgSummon                                   *any
 	Elems                                       []string
 	Ifaces                                      []interface{}
 	CfgPath, ConfigTemplatePath, OutPutFilePath string
@@ -30,11 +26,7 @@ type Template struct {
 	IsExcluded                                  bool
 }
 
-func (w *WarpConfig) CreateWarpConfig(config any) *any {
-	config = w.CfgSumm
-	return w.CfgSumm
-}
-func (t *Template) DecodeConfig() (*WarpConfig, error) {
+func (t *Template) DecodeConfig() (*any, error) {
 
 	err := hclsimple.DecodeFile(t.CfgPath, nil, &t.CfgSummon)
 	if err != nil {
