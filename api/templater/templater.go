@@ -7,7 +7,6 @@ import (
 	"sync"
 	"text/template"
 
-	"github.com/hashicorp/hcl/v2/hclsimple"
 	"go.uber.org/zap"
 
 	"github.com/gateway-fm/scriptorium/logger"
@@ -18,21 +17,10 @@ type ITemplate interface {
 }
 
 type Template struct {
-	CfgSummon                                   *any
-	Elems                                       []string
-	Ifaces                                      []interface{}
-	CfgPath, ConfigTemplatePath, OutPutFilePath string
-	FuncMap                                     template.FuncMap
-	IsExcluded                                  bool
-}
-
-func (t *Template) DecodeConfig() (*any, error) {
-
-	err := hclsimple.DecodeFile(t.CfgPath, nil, &t.CfgSummon)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load configuration: %w", err)
-	}
-	return t.CfgSummon, nil
+	Elems                              []string
+	Ifaces                             []interface{}
+	ConfigTemplatePath, OutPutFilePath string
+	FuncMap                            template.FuncMap
 }
 
 // GenerateFile is generates single *.go file in project's dir

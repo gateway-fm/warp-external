@@ -7,46 +7,26 @@ import (
 	"github.com/gateway-fm/warp-external/api/templater"
 )
 
-type ITemplateFunc interface {
-	AddNewTemplate(temp *templater.Template)
-	GetExternals() ([]templater.ITemplate, error)
-	NewTemplate(elems []string,
-		ifaces []interface{},
-		cfgPath, configTemplatePath, outPutFilePath string,
-		funcMap template.FuncMap) (*templater.Template, error)
-	CreateWarpCfg(cfg any) *any
-	SummonExternal() error
-}
 type TemplateFuncs struct {
-	tps  []templater.ITemplate
-	temp templater.Template
+	tps []templater.ITemplate
 }
 
 func (t *TemplateFuncs) GetExternals() ([]templater.ITemplate, error) {
 	return t.tps, nil
 }
-func (t *TemplateFuncs) AddNewTemplate(temp *templater.Template) {
+func (t *TemplateFuncs) AddNewTemplate(temp templater.ITemplate) {
 	t.tps = append(t.tps, temp)
 }
-func (t *TemplateFuncs) CreateWarpCfg(cfg any) *any {
-	t.temp.CfgSummon = &cfg
-	return t.temp.CfgSummon
-}
-func (t *TemplateFuncs) NewTemplate(elems []string, ifaces []interface{}, cfgPath, configTemplatePath, outPutFilePath string, funcMap template.FuncMap) (*templater.Template, error) {
-	t.temp = templater.Template{
+
+func NewTemplate(elems []string, ifaces []interface{}, configTemplatePath, outPutFilePath string, funcMap template.FuncMap) (templater.ITemplate, error) {
+	temp := templater.Template{
 		Elems:              elems,
 		Ifaces:             ifaces,
-		CfgPath:            cfgPath,
 		ConfigTemplatePath: configTemplatePath,
 		OutPutFilePath:     outPutFilePath,
 		FuncMap:            funcMap,
 	}
-	var err error
-	t.temp.CfgSummon, err = t.temp.DecodeConfig()
-	if err != nil {
-		return nil, fmt.Errorf("error while decoding config:%w", err)
-	}
-	return &t.temp, nil
+	return &temp, nil
 }
 
 // SummonExternal is
