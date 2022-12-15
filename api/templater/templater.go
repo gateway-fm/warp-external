@@ -2,7 +2,6 @@ package templater
 
 import (
 	"fmt"
-	"github.com/gateway-fm/warp-external/config"
 	"os"
 	"path/filepath"
 	"sync"
@@ -18,8 +17,12 @@ type ITemplate interface {
 	GenerateNonGo() error
 }
 
+type WarpConfig struct {
+	CfgSumm *any
+}
+
 type Template struct {
-	CfgSummon                                   *config.SummonConfig //config file that holds config's related service info
+	CfgSummon                                   *WarpConfig
 	Elems                                       []string
 	Ifaces                                      []interface{}
 	CfgPath, ConfigTemplatePath, OutPutFilePath string
@@ -27,7 +30,12 @@ type Template struct {
 	IsExcluded                                  bool
 }
 
-func (t *Template) DecodeConfig() (*config.SummonConfig, error) {
+func (w *WarpConfig) CreateWarpConfig(config any) *any {
+	config = w.CfgSumm
+	return w.CfgSumm
+}
+func (t *Template) DecodeConfig() (*WarpConfig, error) {
+
 	err := hclsimple.DecodeFile(t.CfgPath, nil, &t.CfgSummon)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load configuration: %w", err)
