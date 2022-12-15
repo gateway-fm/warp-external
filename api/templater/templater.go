@@ -3,7 +3,6 @@ package templater
 import (
 	"fmt"
 	"github.com/gateway-fm/warp-external/config"
-	"go/format"
 	"os"
 	"path/filepath"
 	"sync"
@@ -16,22 +15,20 @@ import (
 )
 
 type ITemplate interface {
-	Generate() error
-	Excluded() bool
 	GenerateNonGo() error
 }
 
 type Template struct {
-	CfgSummon                          *config.SummonConfig //config file that holds config's related service info
-	Elems                              []string
-	Ifaces                             []interface{}
-	ConfigTemplatePath, OutPutFilePath string
-	FuncMap                            template.FuncMap
-	IsExcluded                         bool
+	CfgSummon                                   *config.SummonConfig //config file that holds config's related service info
+	Elems                                       []string
+	Ifaces                                      []interface{}
+	CfgPath, ConfigTemplatePath, OutPutFilePath string
+	FuncMap                                     template.FuncMap
+	IsExcluded                                  bool
 }
 
-func (t *Template) DecodeConfig(cfgPath string) (*config.SummonConfig, error) {
-	err := hclsimple.DecodeFile(cfgPath, nil, &t.CfgSummon)
+func (t *Template) DecodeConfig() (*config.SummonConfig, error) {
+	err := hclsimple.DecodeFile(t.CfgPath, nil, &t.CfgSummon)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load configuration: %w", err)
 	}
@@ -67,42 +64,6 @@ func (t *Template) GenerateFile() error {
 			}
 		}()
 		wg.Wait()
-	}
-
-	return nil
-}
-func (t *Template) Excluded() bool {
-	return t.IsExcluded
-}
-
-// GoFmt execute go fmt for specific .go file from the code
-func GoFmt(path string) error {
-
-	read, err := os.ReadFile(path)
-	if err != nil {
-		return err
-	}
-
-	fmted, err := format.Source(read)
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(path, fmted, 0666)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// Generate is main generation function
-func (t *Template) Generate() error {
-	err := t.GenerateFile()
-	if err != nil {
-		return fmt.Errorf(" GenerateScheme returned an error: %w", err)
-	}
-	err = GoFmt(t.OutPutFilePath)
-	if err != nil {
-		return fmt.Errorf(" go fmt returned an error: %w", err)
 	}
 
 	return nil
