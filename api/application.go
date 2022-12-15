@@ -15,6 +15,7 @@ type ITemplateFunc interface {
 		cfgPath, configTemplatePath, outPutFilePath string,
 		funcMap template.FuncMap) (*templater.Template, error)
 	CreateWarpCfg(cfg any) *any
+	SummonExternal() error
 }
 type TemplateFuncs struct {
 	tps  []templater.ITemplate
